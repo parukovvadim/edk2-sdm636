@@ -1,3 +1,4 @@
+#include <PiDxe.h>
 #include <Uefi.h>
 #include <Library/UefiLib.h>
 #include <Library/BaseLib.h>
