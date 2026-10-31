@@ -1,0 +1,39 @@
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = XnuLoader
+  FILE_GUID                      = 8A375E01-098F-4B78-A6B1-38A2D4F6E1C0
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = XnuLoaderEntryPoint
+
+[Sources.common]
+  XnuLoader.c
+  StartGold.S
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPkg/ArmPkg.dec
+  Silicon/Qualcomm/QcomPkg/QcomPkg.dec
+  Platform/RenegadePkg/RenegadePkg.dec
+
+[LibraryClasses]
+  UefiLib
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  PrintLib
+  CacheMaintenanceLib
+  DxeServicesLib
+
+[Protocols]
+  gEfiGraphicsOutputProtocolGuid
+  gEfiSimpleFileSystemProtocolGuid
+  gEfiLoadedImageProtocolGuid
+  gEfiFirmwareVolume2ProtocolGuid
+
+[Guids]
+  gEfiFileInfoGuid

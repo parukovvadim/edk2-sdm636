@@ -526,3 +526,4 @@
 !endif
 
   Platform/RenegadePkg/Application/Reboot2PayloadApp/Reboot2PayloadApp.inf
+  Platform/RenegadePkg/Application/XnuLoader/XnuLoader.inf

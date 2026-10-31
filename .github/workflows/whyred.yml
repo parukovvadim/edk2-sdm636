@@ -5,7 +5,9 @@ on:
   push:
     branches: [master]
     paths:
-      - 'Platform/Xiaomi/sdm660/whyred*'
+      - 'Platform/Xiaomi/sdm660/**'
+      - 'Platform/RenegadePkg/Application/XnuLoader/**'
+      - 'Silicon/Qualcomm/QcomPkg/QcomCommonDsc.inc'
       - 'configs/devices/whyred.conf'
       - '.github/workflows/whyred.yml'
 
@@ -36,14 +38,21 @@ jobs:
         run: |
           ./build.sh --device whyred -r RELEASE
 
-      - name: Check output images
+      - name: Prepare Loader Artifacts
         run: |
-          ls -lh *.img || true
-          ls -lh workspace/Build/whyred/ || true
+          mkdir -p out_efi
+          find workspace/Build/whyred -name "XnuLoader.efi" -exec cp {} out_efi/XnuLoader.efi \; || true
+          if [ -f out_efi/XnuLoader.efi ]; then
+            cp out_efi/XnuLoader.efi out_efi/BOOTAA64.EFI
+            echo "xnu_loader.efi" > out_efi/startup.nsh
+          fi
+          ls -lh out_efi || true
 
       - name: Upload whyred UEFI Artifact
         uses: actions/upload-artifact@v4
         with:
           name: whyred-uefi-boot-img
-          path: ./*.img
+          path: |
+            ./*.img
+            out_efi/*
           retention-days: 14

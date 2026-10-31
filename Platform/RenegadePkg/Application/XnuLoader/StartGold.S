@@ -1,0 +1,38 @@
+#include <AsmMacroIoLibV8.h>
+
+.text
+.align 3
+
+GCC_ASM_EXPORT (gold_entry)
+GCC_ASM_EXPORT (gXnuEntryPa)
+
+.global gXnuEntryPa
+gXnuEntryPa:
+    .quad 0
+
+gold_entry:
+    // PSCI CPU_ON enters with x0 = context_id = ba_pa
+    mov     x19, x0
+
+    // Ensure all interrupts are masked
+    msr     daifset, #0xf
+
+    // Invalidate Instruction Cache and barrier
+    dsb     sy
+    ic      iallu
+    dsb     sy
+    isb
+
+    // Load XNU physical entry point
+    adr     x1, gXnuEntryPa
+    ldr     x1, [x1]
+
+    // x0 = physical address of boot_args structure
+    mov     x0, x19
+
+    // Transfer execution to Apple XNU kernel!
+    br      x1
+
+dead:
+    wfe
+    b       dead
