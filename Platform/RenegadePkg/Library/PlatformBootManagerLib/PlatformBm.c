@@ -336,6 +336,54 @@ PlatformRegisterFvBootOption(
 }
 
 STATIC
+UINT16
+PlatformRegisterFvBootOptionFirst(
+    CONST EFI_GUID *FileGuid, CHAR16 *Description, UINT32 Attributes)
+{
+  EFI_STATUS                        Status;
+  INTN                              OptionIndex;
+  EFI_BOOT_MANAGER_LOAD_OPTION      NewOption;
+  EFI_BOOT_MANAGER_LOAD_OPTION *    BootOptions;
+  UINTN                             BootOptionCount;
+  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH FileNode;
+  EFI_LOADED_IMAGE_PROTOCOL *       LoadedImage;
+  EFI_DEVICE_PATH_PROTOCOL *        DevicePath;
+  UINT16                            OptionNumber;
+
+  Status = gBS->HandleProtocol(
+      gImageHandle, &gEfiLoadedImageProtocolGuid, (VOID **)&LoadedImage);
+  ASSERT_EFI_ERROR(Status);
+
+  EfiInitializeFwVolDevicepathNode(&FileNode, FileGuid);
+  DevicePath = DevicePathFromHandle(LoadedImage->DeviceHandle);
+  ASSERT(DevicePath != NULL);
+  DevicePath =
+      AppendDevicePathNode(DevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&FileNode);
+  ASSERT(DevicePath != NULL);
+
+  Status = EfiBootManagerInitializeLoadOption(
+      &NewOption, LoadOptionNumberUnassigned, LoadOptionTypeBoot, Attributes,
+      Description, DevicePath, NULL, 0);
+  ASSERT_EFI_ERROR(Status);
+  FreePool(DevicePath);
+
+  BootOptions =
+      EfiBootManagerGetLoadOptions(&BootOptionCount, LoadOptionTypeBoot);
+
+  OptionIndex =
+      EfiBootManagerFindLoadOption(&NewOption, BootOptions, BootOptionCount);
+
+  if (OptionIndex == -1) {
+    Status = EfiBootManagerAddLoadOptionVariable(&NewOption, 0);
+    ASSERT_EFI_ERROR(Status);
+  }
+  OptionNumber = NewOption.OptionNumber;
+  EfiBootManagerFreeLoadOption(&NewOption);
+  EfiBootManagerFreeLoadOptions(BootOptions, BootOptionCount);
+  return OptionNumber;
+}
+
+STATIC
 VOID GetPlatformOptions(VOID)
 {
   EFI_STATUS                      Status;
@@ -671,6 +719,15 @@ VOID EFIAPI PlatformBootManagerAfterConsole(VOID)
   // Enumerate all possible boot options.
   //
   EfiBootManagerRefreshAllBootOption();
+
+  //
+  // Register Apple iOS XNU Loader (Boot Option 0)
+  //
+  STATIC EFI_GUID gXnuLoaderFileGuid = {
+      0x8A375E01, 0x098F, 0x4B78, { 0xA6, 0xB1, 0x38, 0xA2, 0xD4, 0xF6, 0xE1, 0xC0 }
+  };
+  PlatformRegisterFvBootOptionFirst(
+      &gXnuLoaderFileGuid, L"Apple iOS XNU Loader", LOAD_OPTION_ACTIVE);
 
   //
   // Register UEFI Shell

@@ -249,6 +249,9 @@ EFI_STATUS EFIAPI XnuLoaderEntryPoint(
 )
 {
     gBS->SetWatchdogTimer(0, 0, 0, NULL);
+    if (gST->ConOut != NULL) {
+        gST->ConOut->ClearScreen(gST->ConOut);
+    }
     Print(L"\n========================================\n");
     Print(L"  XNU Mach-O UEFI Loader for whyred\n");
     Print(L"  Xiaomi Redmi Note 5 / Pro (SDM636)\n");
