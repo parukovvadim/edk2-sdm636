@@ -1,0 +1,49 @@
+name: Build whyred UEFI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - 'Platform/Xiaomi/sdm660/whyred*'
+      - 'configs/devices/whyred.conf'
+      - '.github/workflows/whyred.yml'
+
+jobs:
+  build:
+    name: Build whyred UEFI Boot Image
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo install -d -m 0755 /etc/apt/keyrings
+          sudo wget -O /etc/apt/keyrings/winehq-archive.key \
+            https://dl.winehq.org/wine-builds/winehq.key
+          sudo chmod 644 /etc/apt/keyrings/winehq-archive.key
+          sudo wget -O /etc/apt/sources.list.d/winehq-noble.sources \
+            https://dl.winehq.org/wine-builds/ubuntu/dists/noble/winehq-noble.sources
+          sudo apt-get update
+          sudo apt-get install --install-recommends winehq-stable libsdl2-2.0-0 libsdl2-dev \
+            build-essential uuid-dev clang llvm iasl nasm gcc-aarch64-linux-gnu abootimg \
+            python3-pil python3-git gettext libgcc-s1:i386 libstdc++6:i386 -y
+
+      - name: Build UEFI image for whyred
+        run: |
+          ./build.sh --device whyred -r RELEASE
+
+      - name: Check output images
+        run: |
+          ls -lh *.img || true
+          ls -lh workspace/Build/whyred/ || true
+
+      - name: Upload whyred UEFI Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: whyred-uefi-boot-img
+          path: ./*.img
+          retention-days: 14

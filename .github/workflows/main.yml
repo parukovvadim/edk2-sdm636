@@ -5,6 +5,7 @@ name: msm-Build
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
 on:
+  workflow_dispatch:
   push:
     branches: [master]
   pull_request:
@@ -32,6 +33,8 @@ jobs:
           - hotdog
           - guacamole
           - guacamoleb
+          # sdm660
+          - whyred
           # sdm845
           - fajita
           - beryllium-ebbg
