@@ -7,6 +7,7 @@ on:
     paths:
       - 'Platform/Xiaomi/sdm660/**'
       - 'Platform/RenegadePkg/Application/XnuLoader/**'
+      - 'Platform/RenegadePkg/Drivers/LogoDxe/**'
       - 'Silicon/Qualcomm/QcomPkg/QcomCommonDsc.inc'
       - 'configs/devices/whyred.conf'
       - '.github/workflows/whyred.yml'
