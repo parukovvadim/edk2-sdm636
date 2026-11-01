@@ -153,23 +153,6 @@ static VOID PrepareGic(VOID)
     }
 }
 
-static VOID SetGoldCpuFreqMax(VOID)
-{
-    UINTN b = 0x0f523000;
-    UINT32 best = 0, best_khz = 0, prev = 0;
-    for (UINT32 i = 0; i < 12; i++) {
-        UINT32 v = MmioRead32(b + 0x110 + i * 0x20);
-        UINT32 khz = ((v >> 30) & 3) ? 19200 * (v & 0xff) : 300000;
-        if (i && khz == prev) break;
-        prev = khz;
-        if (khz > best_khz) {
-            best_khz = khz;
-            best = i;
-        }
-    }
-    MmioWrite32(b + 0x920, best);
-}
-
 static EFI_STATUS LoadPayload(OUT VOID **PayloadBuf, OUT UINTN *PayloadSize)
 {
     EFI_STATUS Status;
@@ -339,12 +322,13 @@ EFI_STATUS EFIAPI XnuLoaderEntryPoint(
     Print(L"[+] boot_args: pa=0x%lx, top=0x%lx\n", ba_pa, top);
     Print(L"[+] XNU entry physical: 0x%lx\n", entry_pa);
 
-    // 4. Prepare hardware (cpufreq & GICv3)
-    SetGoldCpuFreqMax();
+    // 4. Prepare hardware (GICv3)
+    Print(L"[+] Configuring GICv3...\n");
     PrepareGic();
+    Print(L"[+] GICv3 configured.\n");
 
     Print(L"[+] Booting Apple XNU kernel on Gold CPU 0x100...\n\n");
-    gBS->Stall(1500000); // 1.5s delay to let user read status
+    gBS->Stall(2000000); // 2s delay to let user read status
 
     // 5. Exit Boot Services
     UINTN MemoryMapSize = 0;
