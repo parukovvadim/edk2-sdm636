@@ -23,17 +23,18 @@ jobs:
 
       - name: Install dependencies
         run: |
+          export DEBIAN_FRONTEND=noninteractive
           sudo dpkg --add-architecture i386
           sudo install -d -m 0755 /etc/apt/keyrings
-          sudo wget -O /etc/apt/keyrings/winehq-archive.key \
+          sudo wget -q -O /etc/apt/keyrings/winehq-archive.key \
             https://dl.winehq.org/wine-builds/winehq.key
           sudo chmod 644 /etc/apt/keyrings/winehq-archive.key
-          sudo wget -O /etc/apt/sources.list.d/winehq-noble.sources \
+          sudo wget -q -O /etc/apt/sources.list.d/winehq-noble.sources \
             https://dl.winehq.org/wine-builds/ubuntu/dists/noble/winehq-noble.sources
-          sudo apt-get update
-          sudo apt-get install --install-recommends winehq-stable libsdl2-2.0-0 libsdl2-dev \
+          sudo -E apt-get update
+          sudo -E apt-get install --install-recommends winehq-stable libsdl2-2.0-0 libsdl2-dev \
             build-essential uuid-dev clang llvm iasl nasm gcc-aarch64-linux-gnu abootimg \
-            python3-pil python3-git gettext libgcc-s1:i386 libstdc++6:i386 -y
+            python3-pil python3-git gettext libgcc-s1:i386 libstdc++6:i386 -y -q
 
       - name: Build UEFI image for whyred
         run: |
