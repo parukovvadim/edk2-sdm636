@@ -6,7 +6,6 @@ on:
     branches: [master]
     paths:
       - 'Platform/Xiaomi/sdm660/**'
-      - 'Silicon/Qualcomm/sdm660/**'
       - 'Platform/RenegadePkg/Application/XnuLoader/**'
       - 'Platform/RenegadePkg/Drivers/LogoDxe/**'
       - 'Silicon/Qualcomm/QcomPkg/QcomCommonDsc.inc'
