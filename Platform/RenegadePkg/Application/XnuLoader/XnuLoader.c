@@ -322,10 +322,16 @@ EFI_STATUS EFIAPI XnuLoaderEntryPoint(
     Print(L"[+] boot_args: pa=0x%lx, top=0x%lx\n", ba_pa, top);
     Print(L"[+] XNU entry physical: 0x%lx\n", entry_pa);
 
-    // 4. Prepare hardware (GICv3)
+    // 4. Prepare hardware (GICv3 & Watchdog)
     Print(L"[+] Configuring GICv3...\n");
     PrepareGic();
     Print(L"[+] GICv3 configured.\n");
+
+    // Disable Qualcomm APSS Hardware Watchdog
+    Print(L"[+] Disabling Qualcomm APSS Watchdog...\n");
+    MmioWrite32(0x17980000 + 0x8, 0); // APSS_WDT_ENABLE = 0
+    MmioWrite32(0x17980000 + 0x0, 1); // APSS_WDT_RST = 1 (pet)
+    Print(L"[+] Qualcomm APSS Watchdog disabled.\n");
 
     Print(L"[+] Booting Apple XNU kernel on Gold CPU 0x100...\n\n");
     gBS->Stall(2000000); // 2s delay to let user read status
