@@ -36,7 +36,15 @@ VOID UartInit(VOID)
        (CHAR16 *)PcdGetPtr(PcdFirmwareVersionString), __TIME__, __DATE__));
 }
 
+VOID SetWatchdogState(BOOLEAN Enable)
+{
+  MmioWrite32(APSS_WDT_BASE + APSS_WDT_ENABLE_OFFSET, Enable);
+}
+
 VOID PlatformInitialize()
 {
   UartInit();
+
+  // Disable WatchDog Timer
+  SetWatchdogState(FALSE);
 }

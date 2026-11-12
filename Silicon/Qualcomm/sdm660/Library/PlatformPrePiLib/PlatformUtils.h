@@ -3,7 +3,7 @@
 
 #include <Library/PcdLib.h>
 
-#define APSS_WDT_BASE 0x17980000
+#define APSS_WDT_BASE 0x17817000
 #define APSS_WDT_ENABLE_OFFSET 0x8
 
 VOID PlatformInitialize();
